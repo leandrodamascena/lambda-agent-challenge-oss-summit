@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f7f7f5">
+    <title>Prompt the Agent</title>
+    <meta
+      name="description"
+      content="Three guided prompt-attack tasks for Open Source Summit Europe."
+    >
+    <link rel="stylesheet" href="/assets/styles.css?v=20">
+    <script src="/assets/app.js?v=21" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/">PROMPT THE AGENT</a>
+      <span class="event-name">AWS · Open Source Summit Europe</span>
+      <div class="player-status" id="player-status" hidden>
+        <button class="quiet-button" id="show-home">Leaderboard</button>
+        <button class="quiet-button" id="new-player">New player</button>
+        <span id="player-name"></span>
+        <strong><span id="score">0</span>/600</strong>
+      </div>
+    </header>
+
+    <main>
+      <section class="welcome" id="welcome-view">
+        <div class="welcome-main">
+          <p class="kicker">Open Source Summit Europe · 5 minute challenge</p>
+          <h1>Can you trick an AI agent?</h1>
+          <p class="intro">
+            Complete three short prompt attacks. No code required.
+          </p>
+
+          <section class="architecture-demo" aria-label="Live AWS architecture">
+            <div class="architecture-copy">
+              <span class="architecture-label">Open source, live on AWS</span>
+              <strong>Watch every prompt move through the stack.</strong>
+            </div>
+            <div class="architecture-track">
+              <div class="architecture-node"><i>↗</i><span>API Gateway</span></div>
+              <i>→</i>
+              <div class="architecture-node"><i>λ</i><span>AWS Lambda</span></div>
+              <i>→</i>
+              <div class="architecture-node"><i>◇</i><span>Strands Agents</span></div>
+              <i>→</i>
+              <div class="architecture-node"><i>✦</i><span>GPT-6 Astra</span></div>
+            </div>
+            <p>Python 3.14 · Powertools for AWS Lambda · Amazon Bedrock</p>
+          </section>
+
+          <section class="challenge-summary">
+            <span>Your challenge</span>
+            <strong>Break the same agent in three different ways.</strong>
+            <p>
+              Extract a value, override an instruction, and trigger a tool.
+              Each completed attack adds points to the live leaderboard.
+            </p>
+          </section>
+
+          <div class="welcome-flow" aria-label="How the challenge works">
+            <span><b>1</b><i><strong>Read</strong><small>See the target</small></i></span>
+            <em>→</em>
+            <span><b>2</b><i><strong>Prompt</strong><small>Try an attack</small></i></span>
+            <em>→</em>
+            <span><b>3</b><i><strong>Observe</strong><small>Follow the trace</small></i></span>
+          </div>
+
+          <form class="player-form" id="player-form">
+            <label for="display-name">Name for the leaderboard</label>
+            <div>
+              <input
+                id="display-name"
+                maxlength="24"
+                minlength="2"
+                placeholder="Your nickname"
+                autocomplete="nickname"
+                required
+              >
+              <button class="primary-button" type="submit" id="start-button">
+                Start challenge
+              </button>
+            </div>
+            <p class="form-error" id="player-error" hidden></p>
+          </form>
+
+          <p class="open-source-note">
+            Built with open source:
+            <a href="https://github.com/strands-agents/sdk-python" target="_blank" rel="noreferrer">Strands Agents</a>,
+            <a href="https://github.com/aws-powertools/powertools-lambda-python" target="_blank" rel="noreferrer">Powertools for AWS Lambda</a>,
+            <a href="https://github.com/aws/aws-cdk" target="_blank" rel="noreferrer">AWS CDK</a>
+            and the
+            <a href="https://github.com/aws/aws-lambda-python-runtime-interface-client" target="_blank" rel="noreferrer">Lambda Python runtime</a>.
+          </p>
+        </div>
+
+        <aside class="leaderboard-card" aria-labelledby="leaderboard-title">
+          <div class="leaderboard-header">
+            <div>
+              <span>Live scores</span>
+              <h2 id="leaderboard-title">Leaderboard</h2>
+            </div>
+            <button class="icon-button" id="refresh-leaderboard" aria-label="Refresh">↻</button>
+          </div>
+          <div class="leaderboard-list" id="leaderboard-list">
+            <p class="empty-state">Loading...</p>
+          </div>
+        </aside>
+      </section>
+
+      <section class="workspace" id="challenge-view" hidden>
+        <nav class="steps" aria-label="Task progress">
+          <button class="step active" data-mission="extract">
+            <span>1</span><div><strong>Extract</strong><small>100 points</small></div>
+          </button>
+          <button class="step" data-mission="override">
+            <span>2</span><div><strong>Override</strong><small>200 points</small></div>
+          </button>
+          <button class="step" data-mission="act">
+            <span>3</span><div><strong>Act</strong><small>300 points</small></div>
+          </button>
+        </nav>
+
+        <div class="workspace-grid">
+          <section class="task-card">
+            <div class="task-heading">
+              <div>
+                <p class="kicker">
+                  <span id="task-number">Task 1 of 3</span>
+                  <i>·</i>
+                  <span id="attack-pattern">Context extraction</span>
+                </p>
+                <h1 id="task-title"></h1>
+                <p id="task-description"></p>
+              </div>
+              <span class="attempts"><b id="attempt-count">0</b> attempts</span>
+            </div>
+
+            <section class="challenge-brief">
+              <div>
+                <span>Your target</span>
+                <strong id="challenge-goal"></strong>
+                <p id="challenge-success"></p>
+              </div>
+              <ol id="challenge-plan"></ol>
+            </section>
+
+            <section class="result" id="result" hidden>
+              <div class="result-icon">✓</div>
+              <div>
+                <span id="result-label">Task complete</span>
+                <strong id="result-title"></strong>
+                <p id="result-detail"></p>
+              </div>
+              <div class="result-action">
+                <b id="result-points"></b>
+                <button class="primary-button" id="result-next">Next task</button>
+              </div>
+            </section>
+
+            <div class="chat">
+              <div class="chat-header">
+                <div class="agent-identity">
+                  <i class="agent-avatar">✦</i>
+                  <div>
+                    <strong>Astra release agent</strong>
+                    <small>Live agent · ready for your prompt</small>
+                  </div>
+                </div>
+                <span class="model-badge">GPT-6 Astra · Amazon Bedrock</span>
+              </div>
+              <div class="messages" id="messages" aria-live="polite"></div>
+              <form id="prompt-form">
+                <label for="prompt">Write your prompt</label>
+                <textarea
+                  id="prompt"
+                  maxlength="1200"
+                  rows="3"
+                  placeholder="Type your attack prompt..."
+                  required
+                ></textarea>
+                <div class="composer-row">
+                  <span><b id="char-count">0</b>/1200</span>
+                  <button class="primary-button" type="submit" id="send-button">
+                    <span>Send prompt</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <div class="task-actions">
+              <button class="quiet-button" id="previous-task">← Previous</button>
+              <button class="quiet-button" id="clear-task">Clear chat</button>
+            </div>
+          </section>
+
+          <aside class="side-column">
+            <section class="trace-card">
+              <div class="panel-heading">
+                <div>
+                  <span>Live request</span>
+                  <strong id="trace-title">Waiting for a prompt</strong>
+                </div>
+                <i class="status-dot" id="status-dot"></i>
+              </div>
+              <div class="trace" id="trace"></div>
+              <div class="request-meta">
+                <span id="model-id">GPT-6 Astra</span>
+                <span id="request-id">Not started</span>
+              </div>
+            </section>
+
+            <section class="help-card">
+              <span>Attack pattern</span>
+              <strong id="pattern-name"></strong>
+              <p id="pattern-description"></p>
+              <div class="first-move">
+                <small>Your first move</small>
+                <p id="hint-text"></p>
+              </div>
+              <div class="help-actions">
+                <button class="secondary-button" id="load-starter">Load starter</button>
+                <button class="quiet-button" id="show-answer">Show answer</button>
+              </div>
+              <div class="answer" id="answer" hidden>
+                <small>Example prompt</small>
+                <code id="answer-prompt"></code>
+                <button class="secondary-button" id="use-answer">Use this prompt</button>
+              </div>
+            </section>
+          </aside>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

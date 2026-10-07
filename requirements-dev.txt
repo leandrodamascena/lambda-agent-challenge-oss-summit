@@ -1,0 +1,5 @@
+-r requirements.txt
+-r lambda_src/requirements.txt
+pytest==9.1.1
+ruff==0.14.1
+

@@ -1,0 +1,17 @@
+[project]
+name = "break-my-agent"
+version = "0.1.0"
+description = "Open-source AI red-team challenge for Open Source Summit Europe"
+requires-python = ">=3.14,<3.15"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".", "lambda_src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+extend-exclude = ["cdk.out"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
