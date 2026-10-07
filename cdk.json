@@ -1,7 +1,7 @@
 {
   "app": ".venv/bin/python app.py",
   "context": {
-    "targetAccount": "563605821138",
+    "targetAccount": "1234567879012",
     "targetRegion": "eu-west-1",
     "@aws-cdk/aws-lambda:recognizeLayerVersion": true,
     "@aws-cdk/core:checkSecretUsage": true,
